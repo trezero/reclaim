@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Manager - Windows Desktop App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="storage_theme_2.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans) !important;
+            background: var(--background) !important;
+            color: var(--foreground) !important;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-sans) !important;
+            font-weight: 600 !important;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            background: var(--background);
+        }
+
+        /* Header Styles */
+        .app-header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 150ms var(--ease-snappy);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-family: var(--font-sans);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--primary-foreground);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--secondary-foreground);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--foreground);
+        }
+
+        .btn-ghost:hover {
+            background: var(--muted);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Drive Cards */
+        .drives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .drive-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 200ms var(--ease-smooth);
+            animation: driveCardReveal 400ms var(--ease-bounce) backwards;
+        }
+
+        .drive-card:nth-child(1) { animation-delay: 0ms; }
+        .drive-card:nth-child(2) { animation-delay: 150ms; }
+        .drive-card:nth-child(3) { animation-delay: 300ms; }
+
+        @keyframes driveCardReveal {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+        }
+
+        .drive-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .drive-card.critical {
+            border-color: var(--chart-1);
+            background: linear-gradient(135deg, var(--card) 0%, oklch(0.98 0.03 15) 100%);
+        }
+
+        .drive-card.warning {
+            border-color: var(--chart-4);
+        }
+
+        .drive-card.healthy {
+            border-color: var(--chart-2);
+        }
+
+        .drive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .drive-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .drive-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-critical {
+            background: var(--chart-1);
+            color: white;
+            animation: statusPulse 2000ms infinite;
+        }
+
+        .status-warning {
+            background: var(--chart-4);
+            color: white;
+        }
+
+        .status-healthy {
+            background: var(--chart-2);
+            color: white;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .drive-progress {
+            margin: 1.5rem 0;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--muted);
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 800ms var(--ease-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-critical {
+            background: var(--gradient-danger);
+        }
+
+        .progress-warning {
+            background: var(--gradient-warning);
+        }
+
+        .progress-healthy {
+            background: var(--gradient-success);
+        }
+
+        .drive-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            font-family: var(--font-mono);
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: linear-gradient(135deg, oklch(0.95 0.05 15) 0%, oklch(0.97 0.03 30) 100%);
+            border: 2px solid var(--chart-1);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: alertSlide 600ms var(--ease-bounce);
+        }
+
+        @keyframes alertSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
+
+        .alert-icon {
+            color: var(--chart-1);
+            flex-shrink: 0;
+        }
+
+        .alert-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--foreground);
+        }
+
+        .alert-content p {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        /* Space Consumers Table */
+        .consumers-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            animation: pageLoad 600ms var(--ease-smooth);
+        }
+
+        @keyframes pageLoad {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+        }
+
+        .consumers-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--foreground);
+        }
+
+        .consumer-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            transition: all 200ms var(--ease-smooth);
+            animation: itemReveal 300ms var(--ease-smooth) backwards;
+        }
+
+        .consumer-item:nth-child(1) { animation-delay: 100ms; }
+        .consumer-item:nth-child(2) { animation-delay: 200ms; }
+        .consumer-item:nth-child(3) { animation-delay: 300ms; }
+        .consumer-item:nth-child(4) { animation-delay: 400ms; }
+        .consumer-item:nth-child(5) { animation-delay: 500ms; }
+
+        @keyframes itemReveal {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+        }
+
+        .consumer-item:hover {
+            background: var(--glass-light);
+            backdrop-filter: var(--glass-blur);
+        }
+
+        .consumer-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .consumer-bar {
+            flex: 2;
+            height: 8px;
+            background: var(--muted);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .consumer-bar-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 9999px;
+            transition: width 800ms var(--ease-smooth);
+        }
+
+        .consumer-size {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--foreground);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* AI Button */
+        .ai-button {
+            margin-top: 2rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-ai {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: var(--radius-lg);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 200ms var(--ease-snappy);
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .btn-ai:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Plan Selection Screen */
+        .plan-selection {
+            display: none;
+        }
+
+        .plan-selection.active {
+            display: block;
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            background: var(--muted);
+            border: none;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 150ms var(--ease-smooth);
+        }
+
+        .back-btn:hover {
+            background: var(--accent);
+            transform: translateX(-2px);
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .plan-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 300ms var(--ease-bounce);
+            animation: planReveal 500ms var(--ease-bounce) backwards;
+        }
+
+        .plan-card:nth-child(1) { animation-delay: 0ms; }
+        .plan-card:nth-child(2) { animation-delay: 200ms; }
+        .plan-card:nth-child(3) { animation-delay: 400ms; }
+
+        @keyframes planReveal {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--primary);
+        }
+
+        .plan-card.recommended {
+            border-color: var(--primary);
+            background: var(--gradient-card);
+        }
+
+        .plan-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .plan-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-metric {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .plan-metric-value {
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .plan-description {
+            color: var(--muted-foreground);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .recommended-badge {
+            background: var(--gradient-success);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-align: center;
+            margin-top: 1rem;
+            animation: badgeBounce 800ms var(--ease-bounce) 400ms backwards;
+        }
+
+        @keyframes badgeBounce {
+            from {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .ai-reasoning {
+            background: var(--glass-light);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .ai-reasoning-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .ai-reasoning-text {
+            color: var(--foreground);
+            line-height: 1.7;
+        }
+
+        /* Plan Details Screen */
+        .plan-details {
+            display: none;
+        }
+
+        .plan-details.active {
+            display: block;
+        }
+
+        .plan-summary {
+            background: var(--gradient-card);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 2rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .operation-section {
+            margin-bottom: 2rem;
+        }
+
+        .operation-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--muted);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 200ms var(--ease-smooth);
+        }
+
+        .operation-header:hover {
+            background: var(--accent);
+        }
+
+        .operation-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .operation-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 400ms var(--ease-smooth);
+        }
+
+        .operation-content.expanded {
+            max-height: 1000px;
+        }
+
+        .action-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .path-info {
+            background: var(--muted);
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin: 0.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+
+        .safety-info {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--glass-light);
+            border-radius: var(--radius);
+        }
+
+        .safety-icon {
+            color: var(--chart-2);
+            flex-shrink: 0;
+        }
+
+        /* Execution Screen */
+        .execution-screen {
+            display: none;
+        }
+
+        .execution-screen.active {
+            display: block;
+        }
+
+        .execution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .overall-progress {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .progress-bar-large {
+            height: 20px;
+            background: var(--muted);
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill-large {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 9999px;
+            transition: width 400ms var(--ease-smooth);
+            position: relative;
+        }
+
+        .progress-fill-large.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: progressPulse 1500ms infinite;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .steps-list {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-icon {
+            flex-shrink: 0;
+        }
+
+        .step-icon.complete {
+            color: var(--chart-2);
+            animation: stepComplete 300ms var(--ease-bounce);
+        }
+
+        @keyframes stepComplete {
+            from {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        .step-icon.active {
+            animation: spin 1000ms linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .step-icon.pending {
+            color: var(--muted-foreground);
+            opacity: 0.5;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
+        .live-log {
+            background: oklch(0.15 0.02 280);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .log-header {
+            color: var(--muted-foreground);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+        }
+
+        .log-content {
+            background: oklch(0.12 0.02 280);
+            border-radius: var(--radius);
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+
+        .log-entry {
+            color: var(--chart-2);
+            margin-bottom: 0.5rem;
+            animation: logEntry 300ms var(--ease-smooth);
+        }
+
+        @keyframes logEntry {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
+
+        .log-time {
+            color: var(--muted-foreground);
+        }
+
+        .eta-info {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--muted-foreground);
+            font-family: var(--font-mono);
+        }
+
+        /* Settings Screen */
+        .settings-screen {
+            display: none;
+        }
+
+        .settings-screen.active {
+            display: block;
+        }
+
+        .settings-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .settings-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            transition: background 200ms var(--ease-smooth);
+        }
+
+        .setting-item:hover {
+            background: var(--glass-light);
+        }
+
+        .toggle-switch {
+            width: 48px;
+            height: 24px;
+            background: var(--muted);
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background 200ms var(--ease-smooth);
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 200ms var(--ease-bounce);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--foreground);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--background);
+            color: var(--foreground);
+            font-family: var(--font-mono);
+            transition: all 200ms var(--ease-smooth);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glass-light);
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--background);
+            color: var(--foreground);
+            cursor: pointer;
+            transition: all 200ms var(--ease-smooth);
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glass-light);
+        }
+
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-title">
+                <i data-lucide="hard-drive" style="width: 24px; height: 24px;"></i>
+                <span>Storage Manager</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost" onclick="showSettings()">
+                    <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+                    Settings
+                </button>
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard" class="dashboard-content">
+            <!-- Drive Cards -->
+            <div class="drives-grid">
+                <div class="drive-card critical">
+                    <div class="drive-header">
+                        <div class="drive-name">C: DRIVE</div>
+                        <div class="drive-status status-critical">90%</div>
+                    </div>
+                    <div class="drive-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-critical" style="width: 90%"></div>
+                        </div>
+                        <div class="drive-stats">
+                            <span>450 GB used</span>
+                            <span>500 GB total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drive-card healthy">
+                    <div class="drive-header">
+                        <div class="drive-name">D: DRIVE</div>
+                        <div class="drive-status status-healthy">12%</div>
+                    </div>
+                    <div class="drive-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-healthy" style="width: 12%"></div>
+                        </div>
+                        <div class="drive-stats">
+                            <span>120 GB used</span>
+                            <span>1 TB total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drive-card warning">
+                    <div class="drive-header">
+                        <div class="drive-name">F: DRIVE</div>
+                        <div class="drive-status status-warning">40%</div>
+                    </div>
+                    <div class="drive-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-warning" style="width: 40%"></div>
+                        </div>
+                        <div class="drive-stats">
+                            <span>200 GB used</span>
+                            <span>500 GB total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Banner -->
+            <div class="alert-banner">
+                <div class="alert-icon">
+                    <i data-lucide="alert-triangle" style="width: 32px; height: 32px;"></i>
+                </div>
+                <div class="alert-content">
+                    <h3>⚠️ IMBALANCE DETECTED</h3>
+                    <p>C: drive is 90% full while D: has 880GB free space available</p>
+                </div>
+            </div>
+
+            <!-- Top Space Consumers -->
+            <div class="consumers-section">
+                <h2>TOP SPACE CONSUMERS</h2>
+                <div class="consumer-item">
+                    <div class="consumer-name">Docker Desktop</div>
+                    <div class="consumer-bar">
+                        <div class="consumer-bar-fill" style="width: 85%"></div>
+                    </div>
+                    <div class="consumer-size">85.2 GB</div>
+                </div>
+                <div class="consumer-item">
+                    <div class="consumer-name">WSL Distributions</div>
+                    <div class="consumer-bar">
+                        <div class="consumer-bar-fill" style="width: 32%"></div>
+                    </div>
+                    <div class="consumer-size">32.1 GB</div>
+                </div>
+                <div class="consumer-item">
+                    <div class="consumer-name">Downloads Folder</div>
+                    <div class="consumer-bar">
+                        <div class="consumer-bar-fill" style="width: 19%"></div>
+                    </div>
+                    <div class="consumer-size">18.7 GB</div>
+                </div>
+                <div class="consumer-item">
+                    <div class="consumer-name">Temp Files</div>
+                    <div class="consumer-bar">
+                        <div class="consumer-bar-fill" style="width: 12%"></div>
+                    </div>
+                    <div class="consumer-size">12.3 GB</div>
+                </div>
+                <div class="consumer-item">
+                    <div class="consumer-name">Browser Caches</div>
+                    <div class="consumer-bar">
+                        <div class="consumer-bar-fill" style="width: 9%"></div>
+                    </div>
+                    <div class="consumer-size">8.9 GB</div>
+                </div>
+
+                <div class="ai-button">
+                    <button class="btn-ai" onclick="showPlanSelection()">
+                        <i data-lucide="sparkles" style="width: 24px; height: 24px;"></i>
+                        GET AI RECOMMENDATIONS
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan Selection Screen -->
+        <div id="planSelection" class="plan-selection dashboard-content">
+            <div class="plan-header">
+                <button class="back-btn" onclick="showDashboard()">
+                    <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+                </button>
+                <h1 style="font-size: 1.75rem;">AI Cleanup Recommendations</h1>
+            </div>
+
+            <div class="plans-grid">
+                <!-- Conservative Plan -->
+                <div class="plan-card">
+                    <div class="plan-title" style="color: var(--chart-2);">CONSERVATIVE</div>
+                    <div class="plan-metrics">
+                        <div class="plan-metric">
+                            <i data-lucide="save" style="width: 20px; height: 20px; color: var(--chart-2);"></i>
+                            <span class="plan-metric-value">45.2 GB</span>
+                        </div>
+                        <div class="plan-metric">
+                            <i data-lucide="shield-check" style="width: 20px; height: 20px; color: var(--chart-2);"></i>
+                            <span class="plan-metric-value">Low Risk</span>
+                        </div>
+                        <div class="plan-metric">
+                            <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--chart-2);"></i>
+                            <span class="plan-metric-value">15 min</span>
+                        </div>
+                    </div>
+                    <p class="plan-description">Clean temporary files and caches only. Safest option with minimal changes to your system.</p>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="showPlanDetails('conservative')">View Plan</button>
+                </div>
+
+                <!-- Balanced Plan (Recommended) -->
+                <div class="plan-card recommended">
+                    <div class="plan-title" style="color: var(--primary);">BALANCED</div>
+                    <div class="plan-metrics">
+                        <div class="plan-metric">
+                            <i data-lucide="save" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                            <span class="plan-metric-value">78.9 GB</span>
+                        </div>
+                        <div class="plan-metric">
+                            <i data-lucide="shield-alert" style="width: 20px; height: 20px; color: var(--chart-4);"></i>
+                            <span class="plan-metric-value">Medium Risk</span>
+                        </div>
+                        <div class="plan-metric">
+                            <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                            <span class="plan-metric-value">25 min</span>
+                        </div>
+                    </div>
+                    <p class="plan-description">Move Docker to D: drive and perform cleanup. Balanced approach with good space savings.</p>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="showPlanDetails('balanced')">View Plan</button>
+                    <div class="recommended-badge">✨ RECOMMENDED</div>
+                </div>
+
+                <!-- Aggressive Plan -->
+                <div class="plan-card">
+                    <div class="plan-title" style="color: var(--chart-1);">AGGRESSIVE</div>
+                    <div class="plan-metrics">
+                        <div class="plan-metric">
+                            <i data-lucide="save" style="width: 20px; height: 20px; color: var(--chart-1);"></i>
+                            <span class="plan-metric-value">125.3 GB</span>
+                        </div>
+                        <div class="plan-metric">
+                            <i data-lucide="alert-triangle" style="width: 20px; height: 20px; color: var(--chart-1);"></i>
+                            <span class="plan-metric-value">High Risk</span>
+                        </div>
+                        <div class="plan-metric">
+                            <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--chart-1);"></i>
+                            <span class="plan-metric-value">45 min</span>
+                        </div>
+                    </div>
+                    <p class="plan-description">Relocate user folders and perform full cleanup. Maximum space savings with higher complexity.</p>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="showPlanDetails('aggressive')">View Plan</button>
+                </div>
+            </div>
+
+            <div class="ai-reasoning">
+                <div class="ai-reasoning-header">
+                    <i data-lucide="brain" style="width: 20px; height: 20px;"></i>
+                    AI Reasoning
+                </div>
+                <p class="ai-reasoning-text">
+                    Your C: drive is critically full (90%). The Balanced plan safely moves Docker data to your spacious D: drive while cleaning temporary files. This approach provides significant space savings with minimal risk and easy rollback options.
+                </p>
+            </div>
+        </div>
+
+        <!-- Plan Details Screen -->
+        <div id="planDetails" class="plan-details dashboard-content">
+            <div class="plan-header">
+                <button class="back-btn" onclick="showPlanSelection()">
+                    <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+                </button>
+                <h1 style="font-size: 1.75rem;">Balanced Plan Details</h1>
+            </div>
+
+            <div class="plan-summary">
+                <div class="summary-stats">
+                    <span>💾 78.9 GB freed</span>
+                    <span>🛡️ Medium Risk</span>
+                    <span>⏱️ ~25 minutes</span>
+                </div>
+                <button class="btn btn-primary" onclick="showExecution()">Execute Plan</button>
+            </div>
+
+            <!-- Move Operations -->
+            <div class="operation-section">
+                <div class="operation-header" onclick="toggleOperation(this)">
+                    <div class="operation-title">
+                        <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                        MOVE OPERATIONS (65.2 GB)
+                    </div>
+                </div>
+                <div class="operation-content expanded">
+                    <div class="action-card">
+                        <div class="action-header">
+                            <i data-lucide="check-circle" style="width: 20px; height: 20px; color: var(--chart-2);"></i>
+                            Move Docker Desktop Data
+                        </div>
+                        <div class="path-info">
+                            <div style="margin-bottom: 0.5rem;"><strong>From:</strong> C:\Users\winadmin\AppData\Local\Docker Desktop\</div>
+                            <div style="margin-bottom: 0.5rem;"><strong>To:</strong> D:\Docker\</div>
+                            <div><strong>Size:</strong> 45.2 GB</div>
+                        </div>
+                        <div class="safety-info">
+                            <i data-lucide="lightbulb" style="width: 20px; height: 20px;" class="safety-icon"></i>
+                            <div>
+                                <strong>💡 Safe:</strong> Docker will auto-detect new location<br>
+                                <strong>🔄 Rollback:</strong> Symlink preserved for easy revert
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cleanup Operations -->
+            <div class="operation-section">
+                <div class="operation-header" onclick="toggleOperation(this)">
+                    <div class="operation-title">
+                        <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                        CLEANUP OPERATIONS (13.7 GB)
+                    </div>
+                </div>
+                <div class="operation-content expanded">
+                    <div class="action-card">
+                        <div class="action-header">
+                            <i data-lucide="check-circle" style="width: 20px; height: 20px; color: var(--chart-2);"></i>
+                            Clear Browser Caches
+                        </div>
+                        <div class="path-info">
+                            <div style="margin-bottom: 0.5rem;">Chrome, Edge, Firefox temp files</div>
+                            <div><strong>Size:</strong> 8.9 GB</div>
+                        </div>
+                        <div class="safety-info">
+                            <i data-lucide="lightbulb" style="width: 20px; height: 20px;" class="safety-icon"></i>
+                            <div>
+                                <strong>💡 Safe:</strong> Browsers will rebuild cache automatically<br>
+                                <strong>🔄 Rollback:</strong> Not needed (cache data)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WSL Operations -->
+            <div class="operation-section">
+                <div class="operation-header" onclick="toggleOperation(this)">
+                    <div class="operation-title">
+                        <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                        WSL OPERATIONS (Optional - Click to expand)
+                    </div>
+                </div>
+                <div class="operation-content">
+                    <div class="action-card">
+                        <div class="action-header">
+                            <i data-lucide="terminal" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                            Export & Relocate WSL
+                        </div>
+                        <p style="color: var(--muted-foreground);">Optional operation to move WSL distributions to D: drive.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-ghost" onclick="showPlanSelection()">Cancel</button>
+                <button class="btn btn-primary" onclick="showExecution()">Execute Plan</button>
+            </div>
+        </div>
+
+        <!-- Execution Screen -->
+        <div id="executionScreen" class="execution-screen dashboard-content">
+            <div class="execution-header">
+                <h1 style="font-size: 1.75rem;">Executing Balanced Plan...</h1>
+                <button class="btn btn-ghost">
+                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                    Cancel
+                </button>
+            </div>
+
+            <div class="overall-progress">
+                <div class="progress-label">
+                    <span>Overall Progress</span>
+                    <span>65% (Step 3 of 5)</span>
+                </div>
+                <div class="progress-bar-large">
+                    <div class="progress-fill-large active" style="width: 65%"></div>
+                </div>
+            </div>
+
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-icon complete">
+                        <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div class="step-text">Backup created</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon complete">
+                        <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div class="step-text">Docker service stopped</div>
+                </div>
+                <div class="step-item" style="background: var(--glass-light);">
+                    <div class="step-icon active">
+                        <i data-lucide="loader" style="width: 24px; height: 24px; color: var(--primary);"></i>
+                    </div>
+                    <div class="step-text">
+                        <strong>Moving Docker data...</strong> 29.2 GB / 45.2 GB
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon pending">
+                        <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div class="step-text">Clear browser caches</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon pending">
+                        <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div class="step-text">Restart Docker service</div>
+                </div>
+            </div>
+
+            <div class="live-log">
+                <div class="log-header">LIVE LOG:</div>
+                <div class="log-content">
+                    <div class="log-entry"><span class="log-time">[14:23:15]</span> Starting Docker data migration...</div>
+                    <div class="log-entry"><span class="log-time">[14:23:16]</span> Creating backup at D:\Backups\docker_backup</div>
+                    <div class="log-entry"><span class="log-time">[14:23:45]</span> Stopping Docker Desktop service...</div>
+                    <div class="log-entry"><span class="log-time">[14:23:52]</span> Service stopped successfully</div>
+                    <div class="log-entry"><span class="log-time">[14:23:53]</span> Moving files: 29.2 GB of 45.2 GB copied...</div>
+                </div>
+                <div class="eta-info">Estimated time remaining: 8 minutes</div>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="settings-screen dashboard-content">
+            <div class="plan-header">
+                <button class="back-btn" onclick="showDashboard()">
+                    <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
+                </button>
+                <h1 style="font-size: 1.75rem;">Settings</h1>
+            </div>
+
+            <div class="settings-section">
+                <h3>AI Configuration</h3>
+                <div class="setting-item">
+                    <span>Enable AI Recommendations</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Provider</label>
+                    <select class="select-field">
+                        <option>OpenAI</option>
+                        <option>Anthropic</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">API Key</label>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <input type="password" class="input-field" value="sk-••••••••••••••••••••••••••••" style="flex: 1;">
+                        <button class="btn btn-secondary">Test</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Safety Settings</h3>
+                <div class="setting-item">
+                    <span>Dry Run Mode (Preview only, no changes)</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="setting-item">
+                    <span>Use Recycle Bin (vs permanent delete)</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="setting-item">
+                    <span>Create backups before major operations</span>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Default Targets</h3>
+                <div class="input-group">
+                    <label class="input-label">Primary target drive</label>
+                    <select class="select-field">
+                        <option>D:</option>
+                        <option>F:</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Secondary target drive</label>
+                    <select class="select-field">
+                        <option>F:</option>
+                        <option>D:</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Backup location</label>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <input type="text" class="input-field" value="D:\Backups\" style="flex: 1;">
+                        <button class="btn btn-secondary">Browse</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="btn btn-ghost">Reset</button>
+                <button class="btn btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Screen navigation functions
+        function showDashboard() {
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('planSelection').classList.remove('active');
+            document.getElementById('planDetails').classList.remove('active');
+            document.getElementById('executionScreen').classList.remove('active');
+            document.getElementById('settingsScreen').classList.remove('active');
+        }
+
+        function showPlanSelection() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('planSelection').classList.add('active');
+            document.getElementById('planDetails').classList.remove('active');
+            document.getElementById('executionScreen').classList.remove('active');
+            document.getElementById('settingsScreen').classList.remove('active');
+        }
+
+        function showPlanDetails(planType) {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('planSelection').classList.remove('active');
+            document.getElementById('planDetails').classList.add('active');
+            document.getElementById('executionScreen').classList.remove('active');
+            document.getElementById('settingsScreen').classList.remove('active');
+        }
+
+        function showExecution() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('planSelection').classList.remove('active');
+            document.getElementById('planDetails').classList.remove('active');
+            document.getElementById('executionScreen').classList.add('active');
+            document.getElementById('settingsScreen').classList.remove('active');
+        }
+
+        function showSettings() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('planSelection').classList.remove('active');
+            document.getElementById('planDetails').classList.remove('active');
+            document.getElementById('executionScreen').classList.remove('active');
+            document.getElementById('settingsScreen').classList.add('active');
+        }
+
+        function refreshData() {
+            // Simulate refresh animation
+            const btn = event.target.closest('button');
+            const icon = btn.querySelector('[data-lucide]');
+            icon.style.animation = 'spin 1s linear';
+            setTimeout(() => {
+                icon.style.animation = '';
+            }, 1000);
+        }
+
+        function toggleOperation(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('[data-lucide]');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.setAttribute('data-lucide', 'chevron-right');
+            } else {
+                content.classList.add('expanded');
+                icon.setAttribute('data-lucide', 'chevron-down');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        // Simulate progress animation on execution screen
+        function simulateProgress() {
+            if (document.getElementById('executionScreen').classList.contains('active')) {
+                const progressBar = document.querySelector('.progress-fill-large');
+                const currentWidth = parseInt(progressBar.style.width);
+                if (currentWidth < 100) {
+                    progressBar.style.width = (currentWidth + 1) + '%';
+                }
+            }
+        }
+
+        setInterval(simulateProgress, 500);
+    </script>
+</body>
+</html>
