@@ -1,0 +1,63 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4f46e5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="disk" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3f4f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d1d5db;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+
+  <!-- Hard drive icon -->
+  <g transform="translate(106, 130)">
+    <!-- Main drive body -->
+    <rect x="0" y="0" width="300" height="200" rx="20" fill="url(#disk)" stroke="#9ca3af" stroke-width="8"/>
+
+    <!-- Drive details panel (bottom) -->
+    <rect x="0" y="150" width="300" height="50" rx="0" fill="#374151" opacity="0.3"/>
+
+    <!-- Indicator lights -->
+    <circle cx="40" cy="175" r="8" fill="#10b981"/>
+    <circle cx="70" cy="175" r="8" fill="#3b82f6"/>
+
+    <!-- Drive label lines -->
+    <rect x="110" y="167" width="120" height="6" rx="3" fill="#6b7280"/>
+    <rect x="110" y="181" width="80" height="6" rx="3" fill="#9ca3af"/>
+
+    <!-- Sparkle/clean icon overlay -->
+    <g transform="translate(200, 50)">
+      <!-- Star burst for "clean" effect -->
+      <path d="M 0,-30 L 5,-10 L 25,-10 L 10,0 L 15,20 L 0,10 L -15,20 L -10,0 L -25,-10 L -5,-10 Z"
+            fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/>
+      <circle cx="0" cy="0" r="8" fill="#ffffff"/>
+    </g>
+
+    <!-- Storage bars (3 bars showing usage) -->
+    <g transform="translate(30, 40)">
+      <!-- Bar 1 - Full -->
+      <rect x="0" y="0" width="80" height="20" rx="10" fill="#e5e7eb"/>
+      <rect x="0" y="0" width="75" height="20" rx="10" fill="#ef4444"/>
+
+      <!-- Bar 2 - Medium -->
+      <rect x="0" y="35" width="80" height="20" rx="10" fill="#e5e7eb"/>
+      <rect x="0" y="35" width="45" height="20" rx="10" fill="#f59e0b"/>
+
+      <!-- Bar 3 - Low -->
+      <rect x="0" y="70" width="80" height="20" rx="10" fill="#e5e7eb"/>
+      <rect x="0" y="70" width="20" height="20" rx="10" fill="#10b981"/>
+    </g>
+  </g>
+
+  <!-- AI sparkle accent (bottom right) -->
+  <g transform="translate(380, 380)">
+    <circle cx="0" cy="0" r="40" fill="#ffffff" opacity="0.2"/>
+    <path d="M 0,-20 L 3,-6 L 15,-6 L 6,2 L 9,15 L 0,8 L -9,15 L -6,2 L -15,-6 L -3,-6 Z"
+          fill="#fbbf24"/>
+  </g>
+</svg>
