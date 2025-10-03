@@ -13,8 +13,12 @@ class Settings(BaseSettings):
     reload: bool = True
     log_level: str = "INFO"
 
-    # CORS Settings
-    allowed_origins: List[str] = ["http://localhost:1420", "tauri://localhost"]
+    # CORS Settings (stored as comma-separated string from .env)
+    allowed_origins: str = "http://localhost:1420,tauri://localhost"
+
+    def get_cors_origins(self) -> List[str]:
+        """Parse and return CORS origins as a list."""
+        return [origin.strip() for origin in self.allowed_origins.split(',')]
 
     # AI Configuration
     openai_api_key: str = ""
