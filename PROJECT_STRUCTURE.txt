@@ -1,0 +1,162 @@
+Storage Manager - Complete Project Structure
+==============================================
+
+storage-manager/
+├── Configuration Files
+│   ├── package.json                    # Node.js dependencies and scripts
+│   ├── tsconfig.json                   # TypeScript configuration
+│   ├── tsconfig.node.json              # TypeScript config for Node
+│   ├── vite.config.ts                  # Vite bundler configuration
+│   ├── tailwind.config.js              # TailwindCSS theme configuration
+│   ├── postcss.config.js               # PostCSS configuration
+│   ├── .eslintrc.cjs                   # ESLint rules
+│   ├── .prettierrc                     # Prettier formatting rules
+│   ├── .env.example                    # Environment variables template
+│   └── .gitignore                      # Git ignore patterns
+│
+├── Frontend Source (src/)
+│   ├── Entry Points
+│   │   ├── main.tsx                    # React app entry point
+│   │   ├── App.tsx                     # Main app component with routing
+│   │   └── index.css                   # Global styles and Tailwind directives
+│   │
+│   ├── Pages (src/pages/)
+│   │   ├── Dashboard.tsx               # Drive overview & top consumers
+│   │   ├── Plans.tsx                   # AI plan selection screen
+│   │   ├── PlanDetails.tsx             # Detailed action list for a plan
+│   │   ├── Execution.tsx               # Live execution progress & logs
+│   │   └── Settings.tsx                # App configuration & preferences
+│   │
+│   ├── Components (src/components/)
+│   │   ├── UI Components (src/components/ui/)
+│   │   │   ├── Button.tsx              # Primary, secondary, ghost buttons
+│   │   │   ├── Card.tsx                # Card container with header/content/footer
+│   │   │   ├── Progress.tsx            # Progress bar with variants
+│   │   │   └── Toggle.tsx              # Toggle switch component
+│   │   │
+│   │   ├── Feature Components
+│   │   │   ├── DriveCard.tsx           # Drive usage visualization card
+│   │   │   ├── PlanCard.tsx            # Cleanup plan card with metrics
+│   │   │   ├── ActionCard.tsx          # Expandable action detail card
+│   │   │   └── ProgressLog.tsx         # Execution progress & live logs
+│   │
+│   ├── Hooks (src/hooks/)
+│   │   ├── useAnalysis.ts              # Fetch drive analysis data
+│   │   ├── usePlans.ts                 # Fetch cleanup plans
+│   │   ├── useExecutePlan.ts           # Execute plan mutation
+│   │   ├── useProgress.ts              # WebSocket progress updates
+│   │   └── useSettings.ts              # Settings CRUD operations
+│   │
+│   ├── Library (src/lib/)
+│   │   ├── api.ts                      # API client & fetch utilities
+│   │   └── utils.ts                    # Helper functions (formatBytes, etc.)
+│   │
+│   └── Types (src/types/)
+│       └── api.ts                      # TypeScript interfaces for API
+│
+├── Tauri Backend (src-tauri/)
+│   ├── src/
+│   │   └── main.rs                     # Rust main entry point
+│   ├── Cargo.toml                      # Rust dependencies
+│   ├── tauri.conf.json                 # Tauri app configuration
+│   └── build.rs                        # Tauri build script
+│
+├── Public Assets (public/)             # Static assets (if any)
+│
+├── Documentation
+│   ├── README.md                       # Complete project documentation
+│   ├── QUICKSTART.md                   # 5-minute setup guide
+│   └── PROJECT_STRUCTURE.txt           # This file
+│
+└── Build Output (generated)
+    ├── dist/                           # Vite production build
+    ├── node_modules/                   # Node dependencies
+    └── src-tauri/target/               # Rust build artifacts
+        └── release/
+            └── storage-manager.exe     # Final executable
+
+==============================================
+Key Features by File
+==============================================
+
+API Integration (src/lib/api.ts):
+  ✓ GET /analyze          → Drive analysis
+  ✓ GET /plans            → AI cleanup plans
+  ✓ GET /plan/{id}        → Plan details
+  ✓ POST /execute         → Start execution
+  ✓ WS /progress/{id}     → Live progress updates
+  ✓ GET/POST /settings    → User preferences
+
+UI Components:
+  ✓ DriveCard             → Shows drive usage with progress bar
+  ✓ PlanCard              → Displays cleanup plan with metrics
+  ✓ ActionCard            → Expandable action details
+  ✓ ProgressLog           → Real-time execution logs
+
+Pages:
+  ✓ Dashboard             → Landing page with drives & consumers
+  ✓ Plans                 → AI plan selection (Conservative/Balanced/Aggressive)
+  ✓ PlanDetails           → Action breakdown & safety info
+  ✓ Execution             → Live progress with logs
+  ✓ Settings              → AI config, safety toggles, targets
+
+Styling:
+  ✓ TailwindCSS           → Utility-first CSS
+  ✓ Framer Motion         → Smooth animations
+  ✓ Custom theme          → Modern color palette
+  ✓ Responsive            → Mobile-friendly (though desktop-focused)
+
+==============================================
+Development Workflow
+==============================================
+
+1. Start Backend:
+   cd backend
+   uvicorn main:app --reload --port 8000
+
+2. Start Frontend:
+   npm run tauri:dev
+
+3. Build Production:
+   npm run tauri:build
+
+4. Lint & Format:
+   npm run lint
+   npm run format
+
+==============================================
+Dependencies Overview
+==============================================
+
+Frontend:
+  - react ^18.2.0
+  - react-router-dom ^6.21.1
+  - @tanstack/react-query ^5.17.19
+  - framer-motion ^10.18.0
+  - lucide-react ^0.303.0
+  - recharts ^2.10.3
+  - tailwindcss ^3.4.0
+
+Desktop:
+  - @tauri-apps/api ^1.5.3
+  - @tauri-apps/cli ^1.5.9
+
+Build Tools:
+  - vite ^5.0.8
+  - typescript ^5.2.2
+  - eslint ^8.55.0
+  - prettier ^3.1.1
+
+==============================================
+Build Artifacts
+==============================================
+
+Development:
+  - Vite dev server: http://localhost:1420
+  - Tauri window: Native OS window
+
+Production:
+  - Windows: storage-manager.exe (~10-20MB)
+  - Location: src-tauri/target/release/
+
+==============================================

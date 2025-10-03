@@ -1,0 +1,133 @@
+:root {
+  /* Base colors - Modern warm neutrals */
+  --background: oklch(0.9850 0.0080 60.0000);
+  --foreground: oklch(0.1200 0.0150 280.0000);
+  --card: oklch(1.0000 0 0);
+  --card-foreground: oklch(0.1200 0.0150 280.0000);
+  --popover: oklch(1.0000 0 0);
+  --popover-foreground: oklch(0.1200 0.0150 280.0000);
+
+  /* Primary - Electric blue for main actions */
+  --primary: oklch(0.6200 0.2800 250.0000);
+  --primary-foreground: oklch(0.9900 0.0050 250.0000);
+
+  /* Secondary - Soft lavender for secondary actions */
+  --secondary: oklch(0.9200 0.0400 300.0000);
+  --secondary-foreground: oklch(0.2500 0.0800 280.0000);
+
+  /* Muted - Warm gray for less important elements */
+  --muted: oklch(0.9500 0.0200 80.0000);
+  --muted-foreground: oklch(0.4800 0.0300 280.0000);
+
+  /* Accent - Bright purple for highlights */
+  --accent: oklch(0.7000 0.2500 320.0000);
+  --accent-foreground: oklch(0.9900 0.0050 320.0000);
+
+  /* Destructive - Vibrant coral-red for critical states */
+  --destructive: oklch(0.6500 0.2600 15.0000);
+  --destructive-foreground: oklch(0.9900 0.0050 15.0000);
+
+  /* System colors for UI elements */
+  --border: oklch(0.8800 0.0150 280.0000);
+  --input: oklch(0.9800 0.0080 60.0000);
+  --ring: oklch(0.6200 0.2800 250.0000);
+
+  /* Drive-specific vibrant colors */
+  --drive-c-critical: oklch(0.6500 0.2600 15.0000);
+  --drive-c-warning: oklch(0.7500 0.2200 35.0000);
+  --drive-d-available: oklch(0.7200 0.2400 150.0000);
+  --drive-f-balanced: oklch(0.6800 0.2200 200.0000);
+
+  /* Status colors - More vibrant */
+  --success: oklch(0.7200 0.2400 150.0000);
+  --success-foreground: oklch(0.9900 0.0050 150.0000);
+  --warning: oklch(0.7500 0.2200 35.0000);
+  --warning-foreground: oklch(0.1200 0.0150 35.0000);
+  --info: oklch(0.6800 0.2200 200.0000);
+  --info-foreground: oklch(0.9900 0.0050 200.0000);
+
+  /* Chart colors for data visualization - Fun gradient-ready */
+  --chart-1: oklch(0.6500 0.2600 15.0000);
+  --chart-2: oklch(0.7200 0.2400 150.0000);
+  --chart-3: oklch(0.6800 0.2200 200.0000);
+  --chart-4: oklch(0.7500 0.2200 35.0000);
+  --chart-5: oklch(0.7000 0.2500 320.0000);
+
+  /* Sidebar colors - Subtle gradient feel */
+  --sidebar: oklch(0.9700 0.0150 280.0000);
+  --sidebar-foreground: oklch(0.1200 0.0150 280.0000);
+  --sidebar-primary: oklch(0.6200 0.2800 250.0000);
+  --sidebar-primary-foreground: oklch(0.9900 0.0050 250.0000);
+  --sidebar-accent: oklch(0.9200 0.0400 300.0000);
+  --sidebar-accent-foreground: oklch(0.2500 0.0800 280.0000);
+  --sidebar-border: oklch(0.8800 0.0150 280.0000);
+  --sidebar-ring: oklch(0.6200 0.2800 250.0000);
+
+  /* Typography - Modern system fonts */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Times New Roman', Times, serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+  /* Border radius - More modern, slightly rounded */
+  --radius: 0.75rem;
+  --radius-sm: calc(var(--radius) - 3px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 3px);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  /* Shadows - More dynamic and colorful */
+  --shadow-2xs: 0 1px 2px 0 hsl(250 80% 50% / 0.05);
+  --shadow-xs: 0 1px 3px 0 hsl(250 80% 50% / 0.08);
+  --shadow-sm: 0 1px 3px 0 hsl(250 80% 50% / 0.12), 0 1px 2px -1px hsl(250 80% 50% / 0.12);
+  --shadow: 0 1px 3px 0 hsl(250 80% 50% / 0.15), 0 1px 2px -1px hsl(250 80% 50% / 0.15);
+  --shadow-md: 0 4px 6px -1px hsl(250 80% 50% / 0.12), 0 2px 4px -2px hsl(250 80% 50% / 0.12);
+  --shadow-lg: 0 10px 15px -3px hsl(250 80% 50% / 0.12), 0 4px 6px -4px hsl(250 80% 50% / 0.12);
+  --shadow-xl: 0 20px 25px -5px hsl(250 80% 50% / 0.15), 0 8px 10px -6px hsl(250 80% 50% / 0.15);
+  --shadow-2xl: 0 25px 50px -12px hsl(250 80% 50% / 0.25);
+
+  /* Spacing system */
+  --spacing: 0.25rem;
+  --spacing-xs: calc(var(--spacing) * 1);
+  --spacing-sm: calc(var(--spacing) * 2);
+  --spacing-md: calc(var(--spacing) * 3);
+  --spacing-lg: calc(var(--spacing) * 4);
+  --spacing-xl: calc(var(--spacing) * 6);
+  --spacing-2xl: calc(var(--spacing) * 8);
+
+  /* Letter spacing for modern typography */
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+
+  /* Progress bar colors - Vibrant gradients */
+  --progress-background: oklch(0.9200 0.0400 300.0000);
+  --progress-c-drive: oklch(0.6500 0.2600 15.0000);
+  --progress-d-drive: oklch(0.7200 0.2400 150.0000);
+  --progress-f-drive: oklch(0.6800 0.2200 200.0000);
+
+  /* Interactive states - More vibrant */
+  --hover-overlay: oklch(0.6200 0.2800 250.0000 / 0.08);
+  --active-overlay: oklch(0.6200 0.2800 250.0000 / 0.15);
+  --focus-ring: oklch(0.6200 0.2800 250.0000 / 0.30);
+
+  /* Risk level colors - More distinct and modern */
+  --risk-low: oklch(0.7200 0.2400 150.0000);
+  --risk-medium: oklch(0.7500 0.2200 35.0000);
+  --risk-high: oklch(0.6500 0.2600 15.0000);
+
+  /* Gradient definitions for modern effects */
+  --gradient-primary: linear-gradient(135deg, oklch(0.6200 0.2800 250.0000), oklch(0.7000 0.2500 320.0000));
+  --gradient-success: linear-gradient(135deg, oklch(0.7200 0.2400 150.0000), oklch(0.6800 0.2200 200.0000));
+  --gradient-warning: linear-gradient(135deg, oklch(0.7500 0.2200 35.0000), oklch(0.6500 0.2600 15.0000));
+  --gradient-card: linear-gradient(135deg, oklch(1.0000 0 0), oklch(0.9900 0.0100 280.0000));
+
+  /* Glass morphism effects */
+  --glass-background: oklch(1.0000 0 0 / 0.80);
+  --glass-border: oklch(0.8800 0.0150 280.0000 / 0.20);
+  --glass-backdrop: blur(12px);
+
+  /* Animation easing */
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-snappy: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
